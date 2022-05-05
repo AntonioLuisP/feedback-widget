@@ -4,7 +4,7 @@ import { FeedbacksRepository } from "./../repositories/FeedbacksRepository"
 interface SubmitFeedbackUseCaseRequest {
   type: string
   comment: string
-  screenshot: string
+  screenshot?: string
 }
 
 export class SubmitFeedbackUseCase {
@@ -15,6 +15,12 @@ export class SubmitFeedbackUseCase {
 
   async execute(request: SubmitFeedbackUseCaseRequest) {
     const { type, comment, screenshot } = request
+
+    if (!type) throw new Error("type missing")
+    if (!comment) throw new Error("comment missing")
+
+    if (screenshot && !screenshot.startsWith("data:image/png;base64"))
+      throw new Error("Invalid screenshot format")
 
     await this.feedbacksRepository.create({
       type,
